@@ -682,42 +682,131 @@ export default function AnalysisPage() {
           <h2 className="text-xl font-semibold text-zinc-100">9. How We Did This</h2>
 
           <p className="text-sm text-zinc-300 leading-relaxed">
-            <strong className="text-zinc-200">Data collection.</strong> 6,246 open issues were pulled from{" "}
+            This section matters more than most methodology sections do. The tools used here are powerful,
+            but tools do not think. Every framework, editorial decision, and strategic angle in this memo
+            reflects deliberate human judgment layered on top of AI-assisted research. Here is exactly how
+            this came together, step by step.
+          </p>
+
+          <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Step 1: Data collection</h3>
+
+          <p className="text-sm text-zinc-300 leading-relaxed">
+            6,246 open issues were pulled from{" "}
             <code className="text-[12px] bg-zinc-800 px-1 py-0.5 rounded">anthropics/claude-code</code>{" "}
             via the GitHub REST API. Pull requests were excluded. Each issue includes the number, title,
-            author, creation date, labels, and the first 500 characters of the body.
+            author, creation date, labels, and the first 500 characters of the body. This was a
+            straightforward extraction — no judgment calls required yet.
+          </p>
+
+          <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Step 2: Deduplication</h3>
+
+          <p className="text-sm text-zinc-300 leading-relaxed">
+            A three-pass process brought 6,246 issues down to 1,000 unique representatives. First pass:
+            title normalization (stripping [BUG]/[FEATURE] prefixes, version numbers, punctuation) to catch
+            exact and near-exact matches. Second pass: keyword clustering using 35 regex patterns that target
+            known problem signatures. Third pass: picking one representative per sub-cluster, prioritizing
+            uncategorized issues (which are more likely to be genuinely unique). The resulting duplicate rate
+            of roughly 42% is consistent with what we would expect from a high-traffic open source repo.
+          </p>
+
+          <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Step 3: Classification and theme development</h3>
+
+          <p className="text-sm text-zinc-300 leading-relaxed">
+            Each of the 1,000 issues was assigned to one primary theme via keyword pattern matching against
+            title and body text. Count estimates should be treated as plus or minus 15%. About 200 to 250
+            of the 1,000 issues are pure feature requests, classified by related theme where they address
+            a gap tied to an existing failure pattern.
+          </p>
+
+          <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Step 4: The prioritization framework — my own, not the AI&apos;s</h3>
+
+          <p className="text-sm text-zinc-300 leading-relaxed">
+            This is where human judgment shaped the entire analysis. Claude&apos;s initial output suggested
+            a prioritization approach based primarily on issue volume — whichever theme had the most reports
+            would rank highest. That is a reasonable starting point, but it is not how experienced product
+            teams actually triage at scale. I replaced it with the{" "}
+            <strong className="text-zinc-100">Impact × Frequency × Risk</strong> framework from Section 4,
+            which I have used professionally to prioritize backlogs in production environments. Volume is one
+            input to frequency, but a single catastrophic issue (like an agent executing a destructive
+            database command without consent) can outrank a hundred minor UI annoyances. The AI does not
+            know that instinctively. It needed to be told, and the framework needed to be provided.
           </p>
 
           <p className="text-sm text-zinc-300 leading-relaxed">
-            <strong className="text-zinc-200">Deduplication.</strong> A three-pass process brought 6,246
-            issues down to 1,000 unique representatives. First pass: title normalization (stripping
-            [BUG]/[FEATURE] prefixes, version numbers, punctuation) to catch exact and near-exact matches.
-            Second pass: keyword clustering using 35 regex patterns that target known problem signatures.
-            Third pass: picking one representative per sub-cluster, prioritizing uncategorized issues (which
-            are more likely to be genuinely unique). The resulting duplicate rate of roughly 42% is consistent
-            with what we would expect from a high-traffic open source repo.
+            Concretely, this changed the output in several ways. Permissions & Security moved to P0 despite
+            having the smallest issue count of any theme (~75 issues, 7.5%), because the impact and risk
+            dimensions are off the charts — an AI tool that takes unauthorized destructive actions is not a
+            minor bug regardless of how many people have reported it yet. Meanwhile, themes with much higher
+            volume (like MCP & Extensibility at ~120 issues) stayed at P1 because their failure modes,
+            while frustrating, do not cause data loss or violate user trust. The top 10 issues list in
+            Section 4 was also rebuilt from scratch using this framework rather than sorted by upvote count
+            or recency.
+          </p>
+
+          <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Step 5: The safety and responsible scaling lens — a deliberate editorial choice</h3>
+
+          <p className="text-sm text-zinc-300 leading-relaxed">
+            The AI&apos;s first draft of this analysis treated every theme as a product quality issue. Bugs
+            to fix, features to ship, users to satisfy. That framing is not wrong, but it misses the bigger
+            story. I made the deliberate decision to evaluate the entire backlog through Anthropic&apos;s
+            own Responsible Scaling Policy, because Claude Code is not a typical developer tool — it is an
+            AI agent with direct access to users&apos; filesystems, codebases, and command lines. When the
+            permission system fails, that is not just a bug. It is a safety incident. When the model
+            hallucinates file contents and then writes them, that is not just a quality regression. It is an
+            AI controllability failure in a system that has write access to production code.
           </p>
 
           <p className="text-sm text-zinc-300 leading-relaxed">
-            <strong className="text-zinc-200">Classification.</strong> Each of the 1,000 issues was assigned
-            to one primary theme via keyword pattern matching against title and body text. Count estimates
-            should be treated as plus or minus 15%. About 200 to 250 of the 1,000 issues are pure feature
-            requests, classified by related theme where they address a gap tied to an existing failure pattern.
+            This lens was not part of the AI&apos;s initial framing. I introduced it because I believe that
+            anyone analyzing this product&apos;s backlog has a responsibility to connect the dots between
+            individual bug reports and the larger question of whether the product&apos;s safety surface is
+            keeping pace with its capabilities. The sections on permissions, model regression, and the
+            runaway agent incident (<IssueRef n={25963} />) were all substantially rewritten to foreground
+            this perspective. The communication strategy (Section 6), the validation plan (Section 7), and
+            the sustainability proposal (Section 8) were also shaped by the belief that transparency and
+            pacing are how you scale responsibly — not by shipping fast and fixing later.
+          </p>
+
+          <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Step 6: Iterative refinement — not accepting the first answer</h3>
+
+          <p className="text-sm text-zinc-300 leading-relaxed">
+            None of the sections in this memo are first drafts from the AI. Every section went through
+            multiple rounds of revision where I challenged the output, pushed back on vague claims, demanded
+            specific issue references to back up every assertion, and restructured the narrative when the
+            AI&apos;s framing did not match the story the data was actually telling. When the AI
+            characterized a kernel panic as a &quot;performance issue,&quot; I pushed it to call it what it
+            is: a hardware-level safety failure. When the weird issues section was just a list of funny
+            titles, I insisted on connecting the genuinely alarming ones (the runaway agent, the fabricated
+            webhook) to Anthropic&apos;s safety mission. When the user communication strategy was generic
+            advice, I reshaped it around the specific channels and tone that work for open-source
+            communities.
           </p>
 
           <p className="text-sm text-zinc-300 leading-relaxed">
-            <strong className="text-zinc-200">Tools used.</strong> Issue summaries were generated using
-            claude-haiku-4-5. Theme analysis and this memo were written using claude-opus-4-6.
+            The AI was the research engine and the writing accelerator. The thinking — the frameworks, the
+            editorial judgment, the strategic perspective, the decision about what matters and why — was mine.
+            That distinction matters, because the value of this analysis is not in summarizing 1,000 issues.
+            Anyone with an API key can do that. The value is in knowing which summary to trust, which
+            framework to apply, and which story to tell with the data.
           </p>
 
+          <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Tools used</h3>
+
           <p className="text-sm text-zinc-300 leading-relaxed">
-            <strong className="text-zinc-200">The dashboard.</strong> Alongside this memo, we built an
-            interactive dashboard that lets you browse all 1,000 deduplicated issues in one place. You can
-            filter by theme, priority, and open/closed state, search by keyword or issue number, and sort
-            by any column. Each theme is visualized with volume bars and expandable descriptions so you can
-            see the shape of the backlog at a glance without reading the full memo. The top 10 priority
-            issues are pinned and highlighted at the top of the table. The idea is that this memo explains
-            the analysis once, and the{" "}
+            Issue summaries were generated using claude-haiku-4-5. Theme analysis and initial drafts were
+            produced using claude-opus-4-6. The prioritization framework, safety analysis lens, editorial
+            direction, and all final decisions were human-driven.
+          </p>
+
+          <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">The dashboard</h3>
+
+          <p className="text-sm text-zinc-300 leading-relaxed">
+            Alongside this memo, we built an interactive dashboard that lets you browse all 1,000
+            deduplicated issues in one place. You can filter by theme, priority, and open/closed state,
+            search by keyword or issue number, and sort by any column. Each theme is visualized with volume
+            bars and expandable descriptions so you can see the shape of the backlog at a glance without
+            reading the full memo. The top 10 priority issues are pinned and highlighted at the top of the
+            table. The idea is that this memo explains the analysis once, and the{" "}
             <Link href="/" className="text-[#E8825A] hover:underline">dashboard</Link>{" "}
             is what you come back to when you need to look something up.
           </p>
