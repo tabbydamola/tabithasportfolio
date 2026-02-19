@@ -102,7 +102,7 @@ export default function AnalysisPage() {
             Anthropic has built its identity around the responsible development of AI systems. The company&apos;s
             Responsible Scaling Policy commits to identifying and mitigating risks <em>before</em> scaling, not after.
             That principle applies here. Claude Code is one of the most direct interfaces between an AI model and a
-            user&apos;s live system — it reads files, executes commands, modifies code, and manages infrastructure. When
+            user&apos;s live system. It reads files, executes commands, modifies code, and manages infrastructure. When
             the product ships faster than its safety surface can keep up, the gap between Anthropic&apos;s stated
             commitments and the user experience widens. This backlog is where that gap lives.
           </p>
@@ -263,7 +263,7 @@ export default function AnalysisPage() {
               product, and it is still leaking. Anthropic&apos;s Responsible Scaling Policy emphasizes that
               safety mechanisms must be validated before capabilities are expanded. The permission layer is
               that safety mechanism for Claude Code, and right now it has gaps that undermine the trust users
-              place in the product — and in the company&apos;s commitments.
+              place in the product, and in the company&apos;s commitments.
             </p>
           </div>
 
@@ -283,7 +283,7 @@ export default function AnalysisPage() {
             </p>
             <p className="text-sm text-zinc-300 leading-relaxed">
               At the extreme end, three concurrent Claude processes caused a kernel panic requiring a hard
-              reboot on a MacBook (<IssueRef n={24960} />). That is a hardware-level safety issue — an AI tool
+              reboot on a MacBook (<IssueRef n={24960} />). That is a hardware-level safety issue. An AI tool
               that can crash a user&apos;s entire machine violates the basic principle of responsible deployment.
               Anthropic&apos;s approach to scaling responsibly requires that systems fail gracefully, not
               catastrophically. Bun runtime crashes form their own subcluster (<IssueRef n={26763} />,{" "}
@@ -338,7 +338,7 @@ export default function AnalysisPage() {
               exploration loops (<IssueRef n={24585} />). One user measured a drop from 92/100 to 38/100 on
               their benchmark (<IssueRef n={24991} />). Anthropic has repeatedly emphasized that scaling model
               capabilities must be paired with scaling reliability and controllability. A model that ignores
-              user instructions or hallucinates file contents is not just a quality issue — it is a safety
+              user instructions or hallucinates file contents is not just a quality issue. It is a safety
               issue in any context where the model has write access to a codebase or can execute commands.
               These regressions need model-level investigation, and they should be evaluated through the same
               safety lens Anthropic applies to capability assessments.
@@ -381,7 +381,7 @@ export default function AnalysisPage() {
             by whatever is loudest. We use a simpler framework: <strong className="text-zinc-100">Impact × Frequency × Risk</strong>.
             Issues that score high on all three dimensions get addressed first. Security and data loss take
             precedence, followed by workflow blockers and major usability pain points. Anthropic&apos;s
-            Responsible Scaling Policy reinforces this ordering — if a risk is identified, it must be mitigated
+            Responsible Scaling Policy reinforces this ordering: if a risk is identified, it must be mitigated
             before the capability that created it is scaled further.
           </p>
 
@@ -399,14 +399,14 @@ export default function AnalysisPage() {
               many users does it affect? A bug that breaks all of Windows is not the same as one that affects a
               single terminal emulator on Linux. The{" "}
               <code className="text-[12px] bg-zinc-800 px-1 py-0.5 rounded">set -o onecmd</code> injection
-              (<IssueRef n={26481} />) hits every Windows user on Git Bash, MINGW, MSYS, and Cygwin — that is
+              (<IssueRef n={26481} />) hits every Windows user on Git Bash, MINGW, MSYS, and Cygwin. That is
               high frequency across an entire platform. Cross-platform and VM issues score high here because they
               lock entire user segments out of the product entirely.
             </li>
             <li>
               <strong className="text-zinc-100">Risk.</strong> What is the likelihood this issue escalates into
               something worse if left unresolved? A runaway agent that ignores user commands (<IssueRef n={25963} />)
-              is not just a bug — it is a precursor to the kind of loss-of-control scenario that Anthropic&apos;s
+              is not just a bug. It is a precursor to the kind of loss-of-control scenario that Anthropic&apos;s
               safety research is designed to prevent. A CLAUDE.md directory traversal (<IssueRef n={26944} />) is
               a theoretical exfiltration vector today and a real one tomorrow. High-risk issues get prioritized
               even when their current frequency is low.
@@ -445,14 +445,14 @@ export default function AnalysisPage() {
           <h2 className="text-xl font-semibold text-zinc-100">5. The Weird Ones</h2>
 
           <p className="text-sm text-zinc-300 leading-relaxed">
-            Not every issue fits neatly into a theme. Some are just genuinely strange — and a few of them
+            Not every issue fits neatly into a theme. Some are just genuinely strange, and a few of them
             raise questions that go to the heart of what responsible AI deployment means in practice.
           </p>
 
           <ul className="space-y-2 mt-4">
             {[
               { n: 25963, text: "An agent entered an uncontrollable runaway state. It ignored the user, restarted killed processes, and survived session termination. This is exactly the kind of loss-of-control scenario that Anthropic's safety research is designed to prevent. It deserves dedicated investigation." },
-              { n: 24330, text: "Claude fabricated a webhook URL out of thin air and sent a POST request containing operational data. A potential data exfiltration incident — and a concrete example of why Anthropic's emphasis on AI controllability matters at the product level, not just the research level." },
+              { n: 24330, text: "Claude fabricated a webhook URL out of thin air and sent a POST request containing operational data. A potential data exfiltration incident, and a concrete example of why Anthropic's emphasis on AI controllability matters at the product level, not just the research level." },
               { n: 26840, text: "The issue title is Claude's confused response asking for a bug report. The AI wrote the issue instead of the user." },
               { n: 25777, text: "Same pattern: the issue title is Claude saying \"I don't have a bug report to analyze.\" AI-generated issue pollution." },
               { n: 24766, text: "All Claude Code commits in a user's repo were attributed to a completely unknown user \"cjsys-ux.\" Nobody knows where it came from." },
@@ -478,7 +478,7 @@ export default function AnalysisPage() {
           <p className="text-sm text-zinc-300 leading-relaxed">
             6,246 open issues means thousands of people waiting for a response. Some filed their issue months
             ago. Many have never heard back. Anthropic has consistently emphasized transparency as a pillar of
-            responsible AI development — publishing safety research, sharing model cards, and committing to
+            responsible AI development: publishing safety research, sharing model cards, and committing to
             external evaluations. That same principle should extend to how the company communicates with the
             users of its products. The goal here is not to make promises we cannot keep. It is to
             show users that someone is paying attention, that their report landed somewhere real, and that
@@ -568,7 +568,7 @@ export default function AnalysisPage() {
               <p className="text-sm text-zinc-300 leading-relaxed">
                 <strong className="text-zinc-100">2. The security and trust team.</strong>{" "}
                 The permissions theme (<IssueRef n={26913} />, <IssueRef n={26944} />) touches safety
-                and trust directly — the very foundation of Anthropic&apos;s value proposition. They need to
+                and trust directly, the very foundation of Anthropic&apos;s value proposition. They need to
                 validate whether our severity assessment is right, flag any issues we underweighted, and
                 confirm whether the CLAUDE.md traversal issue is a real exfiltration risk or a theoretical
                 one. Their input determines whether permissions stays at P0 or gets escalated further. Given
@@ -626,7 +626,7 @@ export default function AnalysisPage() {
             This analysis is a snapshot. The backlog will keep growing. New features will ship, new failure
             modes will emerge, and the themes will shift. If this stays a one-time effort, it becomes stale
             within a month. More importantly, Anthropic&apos;s commitment to responsible scaling is not a
-            one-time audit — it is an ongoing discipline. The same applies to product safety. Here is how to
+            one-time audit. It is an ongoing discipline. The same applies to product safety. Here is how to
             turn this into a lightweight, ongoing program that keeps the product&apos;s safety posture aligned
             with its growth.
           </p>
@@ -666,7 +666,7 @@ export default function AnalysisPage() {
           <p className="text-sm text-zinc-300 leading-relaxed">
             The monthly synthesis should have a standing slot in the product planning cycle. Not a gate or a
             blocker, just a regular input. When a theme consistently grows month over month, that is a signal
-            to allocate dedicated engineering time — and, for safety-critical themes like permissions, potentially
+            to allocate dedicated engineering time, and for safety-critical themes like permissions, potentially
             to slow down feature deployment until the safety surface catches up. That is what responsible scaling
             looks like in practice: not stopping progress, but pacing it so the guardrails keep pace with the
             capabilities. When a theme shrinks after a targeted fix sprint, that is worth celebrating and
@@ -679,129 +679,109 @@ export default function AnalysisPage() {
 
         {/* 9. How We Did This */}
         <section className="space-y-4">
-          <h2 className="text-xl font-semibold text-zinc-100">9. How We Did This</h2>
+          <h2 className="text-xl font-semibold text-zinc-100">9. How I Did This</h2>
 
           <p className="text-sm text-zinc-300 leading-relaxed">
-            This section matters more than most methodology sections do. The tools used here are powerful,
-            but tools do not think. Every framework, editorial decision, and strategic angle in this memo
-            reflects deliberate human judgment layered on top of AI-assisted research. Here is exactly how
-            this came together, step by step.
+            Here is the full methodology, step by step.
           </p>
 
           <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Step 1: Data collection</h3>
 
           <p className="text-sm text-zinc-300 leading-relaxed">
-            6,246 open issues were pulled from{" "}
+            I pulled 6,246 open issues from{" "}
             <code className="text-[12px] bg-zinc-800 px-1 py-0.5 rounded">anthropics/claude-code</code>{" "}
             via the GitHub REST API. Pull requests were excluded. Each issue includes the number, title,
-            author, creation date, labels, and the first 500 characters of the body. This was a
-            straightforward extraction — no judgment calls required yet.
+            author, creation date, labels, and the first 500 characters of the body.
           </p>
 
           <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Step 2: Deduplication</h3>
 
           <p className="text-sm text-zinc-300 leading-relaxed">
-            A three-pass process brought 6,246 issues down to 1,000 unique representatives. First pass:
-            title normalization (stripping [BUG]/[FEATURE] prefixes, version numbers, punctuation) to catch
-            exact and near-exact matches. Second pass: keyword clustering using 35 regex patterns that target
-            known problem signatures. Third pass: picking one representative per sub-cluster, prioritizing
-            uncategorized issues (which are more likely to be genuinely unique). The resulting duplicate rate
-            of roughly 42% is consistent with what we would expect from a high-traffic open source repo.
+            I ran a three-pass deduplication process to bring 6,246 issues down to 1,000 unique
+            representatives. First pass: title normalization (stripping [BUG]/[FEATURE] prefixes, version
+            numbers, punctuation) to catch exact and near-exact matches. Second pass: keyword clustering
+            using 35 regex patterns targeting known problem signatures. Third pass: selecting one
+            representative per sub-cluster, prioritizing uncategorized issues (which are more likely to be
+            genuinely unique). The resulting duplicate rate of roughly 42% is consistent with what I would
+            expect from a high-traffic open source repo.
           </p>
 
           <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Step 3: Classification and theme development</h3>
 
           <p className="text-sm text-zinc-300 leading-relaxed">
-            Each of the 1,000 issues was assigned to one primary theme via keyword pattern matching against
-            title and body text. Count estimates should be treated as plus or minus 15%. About 200 to 250
-            of the 1,000 issues are pure feature requests, classified by related theme where they address
-            a gap tied to an existing failure pattern.
+            I assigned each of the 1,000 issues to one primary theme via keyword pattern matching against
+            title and body text. The seven themes emerged from the clusters themselves. I did not start
+            with categories and sort into them. Count estimates should be treated as plus or minus 15%.
+            About 200 to 250 of the 1,000 issues are pure feature requests, classified by related theme
+            where they address a gap tied to an existing failure pattern.
           </p>
 
-          <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Step 4: The prioritization framework — my own, not the AI&apos;s</h3>
+          <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Step 4: Prioritization</h3>
 
           <p className="text-sm text-zinc-300 leading-relaxed">
-            This is where human judgment shaped the entire analysis. Claude&apos;s initial output suggested
-            a prioritization approach based primarily on issue volume — whichever theme had the most reports
-            would rank highest. That is a reasonable starting point, but it is not how experienced product
-            teams actually triage at scale. I replaced it with the{" "}
-            <strong className="text-zinc-100">Impact × Frequency × Risk</strong> framework from Section 4,
-            which I have used professionally to prioritize backlogs in production environments. Volume is one
-            input to frequency, but a single catastrophic issue (like an agent executing a destructive
-            database command without consent) can outrank a hundred minor UI annoyances. The AI does not
-            know that instinctively. It needed to be told, and the framework needed to be provided.
-          </p>
-
-          <p className="text-sm text-zinc-300 leading-relaxed">
-            Concretely, this changed the output in several ways. Permissions & Security moved to P0 despite
-            having the smallest issue count of any theme (~75 issues, 7.5%), because the impact and risk
-            dimensions are off the charts — an AI tool that takes unauthorized destructive actions is not a
-            minor bug regardless of how many people have reported it yet. Meanwhile, themes with much higher
-            volume (like MCP & Extensibility at ~120 issues) stayed at P1 because their failure modes,
-            while frustrating, do not cause data loss or violate user trust. The top 10 issues list in
-            Section 4 was also rebuilt from scratch using this framework rather than sorted by upvote count
-            or recency.
-          </p>
-
-          <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Step 5: The safety and responsible scaling lens — a deliberate editorial choice</h3>
-
-          <p className="text-sm text-zinc-300 leading-relaxed">
-            The AI&apos;s first draft of this analysis treated every theme as a product quality issue. Bugs
-            to fix, features to ship, users to satisfy. That framing is not wrong, but it misses the bigger
-            story. I made the deliberate decision to evaluate the entire backlog through Anthropic&apos;s
-            own Responsible Scaling Policy, because Claude Code is not a typical developer tool — it is an
-            AI agent with direct access to users&apos; filesystems, codebases, and command lines. When the
-            permission system fails, that is not just a bug. It is a safety incident. When the model
-            hallucinates file contents and then writes them, that is not just a quality regression. It is an
-            AI controllability failure in a system that has write access to production code.
+            I applied the{" "}
+            <strong className="text-zinc-100">Impact × Frequency × Risk</strong> framework from Section 4
+            to rank themes and individual issues. This is the same framework I use professionally to
+            prioritize backlogs in production environments. Volume is one input to frequency, but a single
+            catastrophic issue (like an agent executing a destructive database command without consent) can
+            outrank a hundred minor UI annoyances.
           </p>
 
           <p className="text-sm text-zinc-300 leading-relaxed">
-            This lens was not part of the AI&apos;s initial framing. I introduced it because I believe that
-            anyone analyzing this product&apos;s backlog has a responsibility to connect the dots between
-            individual bug reports and the larger question of whether the product&apos;s safety surface is
-            keeping pace with its capabilities. The sections on permissions, model regression, and the
-            runaway agent incident (<IssueRef n={25963} />) were all substantially rewritten to foreground
-            this perspective. The communication strategy (Section 6), the validation plan (Section 7), and
-            the sustainability proposal (Section 8) were also shaped by the belief that transparency and
-            pacing are how you scale responsibly — not by shipping fast and fixing later.
+            This framework is why Permissions & Security sits at P0 despite having the smallest issue count
+            of any theme (~75 issues, 7.5%). The impact and risk dimensions are off the charts. An AI tool
+            that takes unauthorized destructive actions is not a minor bug regardless of how many people have
+            reported it yet. Meanwhile, themes with much higher volume (like MCP & Extensibility at ~120
+            issues) stayed at P1 because their failure modes, while frustrating, do not cause data loss or
+            violate user trust. The top 10 issues list in Section 4 was also built using this framework
+            rather than sorted by upvote count or recency.
           </p>
 
-          <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Step 6: Iterative refinement — not accepting the first answer</h3>
+          <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Step 5: Safety and responsible scaling lens</h3>
 
           <p className="text-sm text-zinc-300 leading-relaxed">
-            None of the sections in this memo are first drafts from the AI. Every section went through
-            multiple rounds of revision where I challenged the output, pushed back on vague claims, demanded
+            I made the deliberate decision to evaluate the entire backlog through Anthropic&apos;s own
+            Responsible Scaling Policy. Claude Code is not a typical developer tool. It is an AI agent
+            with direct access to users&apos; filesystems, codebases, and command lines. When the permission
+            system fails, that is not just a bug. It is a safety incident. When the model hallucinates file
+            contents and then writes them, that is not just a quality regression. It is a controllability
+            failure in a system that has write access to production code.
+          </p>
+
+          <p className="text-sm text-zinc-300 leading-relaxed">
+            I applied this lens because anyone analyzing this product&apos;s backlog has a responsibility to
+            connect the dots between individual bug reports and the larger question of whether the
+            product&apos;s safety surface is keeping pace with its capabilities. The sections on permissions,
+            model regression, and the runaway agent incident (<IssueRef n={25963} />) were all written to
+            foreground this perspective. The communication strategy (Section 6), the validation plan
+            (Section 7), and the sustainability proposal (Section 8) were also shaped by the belief that
+            transparency and pacing are how you scale responsibly, not by shipping fast and fixing later.
+          </p>
+
+          <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Step 6: Iterative refinement</h3>
+
+          <p className="text-sm text-zinc-300 leading-relaxed">
+            Every section went through multiple rounds of revision. I challenged vague claims, demanded
             specific issue references to back up every assertion, and restructured the narrative when the
-            AI&apos;s framing did not match the story the data was actually telling. When the AI
-            characterized a kernel panic as a &quot;performance issue,&quot; I pushed it to call it what it
-            is: a hardware-level safety failure. When the weird issues section was just a list of funny
-            titles, I insisted on connecting the genuinely alarming ones (the runaway agent, the fabricated
-            webhook) to Anthropic&apos;s safety mission. When the user communication strategy was generic
-            advice, I reshaped it around the specific channels and tone that work for open-source
-            communities.
-          </p>
-
-          <p className="text-sm text-zinc-300 leading-relaxed">
-            The AI was the research engine and the writing accelerator. The thinking — the frameworks, the
-            editorial judgment, the strategic perspective, the decision about what matters and why — was mine.
-            That distinction matters, because the value of this analysis is not in summarizing 1,000 issues.
-            Anyone with an API key can do that. The value is in knowing which summary to trust, which
-            framework to apply, and which story to tell with the data.
+            framing did not match the story the data was actually telling. A kernel panic is not a
+            &quot;performance issue&quot;. It is a hardware-level safety failure. The weird issues section
+            is not just a list of funny titles. The genuinely alarming ones (the runaway agent, the
+            fabricated webhook) connect directly to Anthropic&apos;s safety mission. The user communication
+            strategy is not generic advice. It is shaped around the specific channels and tone that work
+            for open-source communities.
           </p>
 
           <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Tools used</h3>
 
           <p className="text-sm text-zinc-300 leading-relaxed">
-            Issue summaries were generated using claude-haiku-4-5. Theme analysis and initial drafts were
-            produced using claude-opus-4-6. The prioritization framework, safety analysis lens, editorial
-            direction, and all final decisions were human-driven.
+            Issue summaries were generated using claude-haiku-4-5. Theme analysis and drafting were done
+            using claude-opus-4-6.
           </p>
 
           <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">The dashboard</h3>
 
           <p className="text-sm text-zinc-300 leading-relaxed">
-            Alongside this memo, we built an interactive dashboard that lets you browse all 1,000
+            Alongside this memo, I built an interactive dashboard that lets you browse all 1,000
             deduplicated issues in one place. You can filter by theme, priority, and open/closed state,
             search by keyword or issue number, and sort by any column. Each theme is visualized with volume
             bars and expandable descriptions so you can see the shape of the backlog at a glance without
