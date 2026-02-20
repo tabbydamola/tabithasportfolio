@@ -1,6 +1,6 @@
 # Technical Decisions
 
-A plain-language guide to every technical choice in this portfolio project — written so that anyone, regardless of engineering background, can understand *why* each decision was made.
+A plain-language guide to every technical choice in this portfolio project, written so that anyone, regardless of engineering background, can understand *why* each decision was made and *how* Claude Code was used to build it.
 
 ---
 
@@ -22,7 +22,7 @@ This is a portfolio piece that demonstrates product management skills through a 
 - **An interactive dashboard** (`/`) where you can filter, sort, and search all 1,000 issues
 - **A written analysis memo** (`/analysis`) that explains what the data means and what to do about it
 
-The project is built as a Next.js web application and deployed on Vercel.
+The project is built as a Next.js web application and deployed on Vercel. I am not an engineer; I built this by leveraging Claude Code as my development tool. I described what I wanted at each stage, Claude Code recommended the technologies and wrote the code, and I directed the process through iterative prompting: reviewing output, requesting changes, and making the product and design decisions throughout. The analysis, prioritization framework, theme definitions, and editorial content are entirely my own work. The technical implementation is the result of that collaboration.
 
 ---
 
@@ -38,176 +38,118 @@ The project is built as a Next.js web application and deployed on Vercel.
 | **Lucide React** | Provides the icons used throughout the UI | 0.575.0 |
 | **clsx + tailwind-merge** | Helpers for combining CSS class names cleanly | 2.1.1 / 3.5.0 |
 | **Playwright** | Generates a PDF of the analysis memo using a headless browser | 1.58.2 |
-| **Vercel** | Hosts and deploys the live site | — |
+| **Vercel** | Hosts and deploys the live site | N/A |
 
 ---
 
 ## 3. Detailed Decision Walkthrough
 
+The tech stack was not something I selected from prior experience. I described what I wanted to build (an interactive dashboard with filtering, sorting, and a long-form analysis page), and Claude Code recommended these technologies as the standard modern stack for this type of project. Below is what each technology does and why it made sense, which I now understand well enough to explain and defend.
+
 ### Why Next.js
 
-Next.js is a framework built on top of React that handles routing (turning URLs like `/analysis` into pages), server-side rendering, and performance optimization out of the box. The alternative would be building all of that from scratch or stitching together several smaller libraries.
+Next.js is a framework built on top of React that handles routing (turning URLs like `/analysis` into pages), server-side rendering, and performance optimization out of the box. Claude Code recommended it because the alternative would be building all of that from scratch or stitching together several smaller libraries.
 
-For this project, the key benefit is **Server Components** — a feature that lets certain parts of the app run only on the server, never in the user's browser. The CSV data (1,000 issues) is read from disk using Node.js file system APIs, which only work on a server. Next.js makes this seamless: the homepage reads the CSV, classifies every issue, and sends the finished HTML to the browser. The user never downloads the raw CSV.
-
-**Version 16.1.6** was used because it was the latest stable release at the time of development and includes full support for React 19 and Tailwind CSS v4.
+For this project, the key benefit is **Server Components**, a feature that lets certain parts of the app run only on the server, never in the user's browser. The CSV data (1,000 issues) is read from disk using Node.js file system APIs, which only work on a server. Next.js makes this seamless: the homepage reads the CSV, classifies every issue, and sends the finished HTML to the browser. The user never downloads the raw CSV.
 
 ### Why React
 
-React is the most widely used library for building interactive user interfaces. It uses a component model — each piece of the UI (a card, a table, a filter dropdown) is a self-contained building block that manages its own state and appearance.
+React is the most widely used library for building interactive user interfaces. It comes bundled with Next.js, so choosing Next.js meant choosing React. It uses a component model: each piece of the UI (a card, a table, a filter dropdown) is a self-contained building block that manages its own state and appearance.
 
-This project has five interactive dashboard components (summary cards, theme overview, issues table, top issues, user stories) and one long-form content page (the analysis memo). React makes it straightforward to compose these from smaller pieces and update them efficiently when the user interacts (filtering, sorting, searching, expanding sections).
+This project has five dashboard components and one long-form content page. React makes it straightforward to compose these from smaller pieces and update them efficiently when the user interacts (filtering, sorting, searching, expanding sections).
 
 ### Why TypeScript
 
-TypeScript is JavaScript with a type system added on top. Where plain JavaScript lets you pass anything anywhere and only tells you something is wrong when the code crashes at runtime, TypeScript catches mistakes while you're writing the code.
-
-For this project, TypeScript matters because the data pipeline has several handoff points: raw CSV rows become `RawIssue` objects, which become fully classified `Issue` objects, which get passed to components that expect specific fields like `theme` (one of 8 possible values) and `priority` (one of `P0`, `P1`, or `P2`). TypeScript ensures that every step in this chain agrees on the shape of the data. If a field name is misspelled or a new theme is added without updating the type definitions, the code won't compile.
-
-The type definitions live in `src/lib/types.ts`.
+TypeScript is JavaScript with a type system added on top. Claude Code scaffolded the project with TypeScript enabled because of how data flows through the app: raw CSV rows become classified issue objects, which get passed to components that expect specific fields. TypeScript ensures every step in this chain agrees on the shape of the data. If a field name is misspelled or a new theme is added without updating the type definitions, the code won't compile, catching errors before they reach users.
 
 ### Why Tailwind CSS v4
 
-Tailwind CSS is a styling approach where instead of writing separate CSS files with class names like `.card-header`, you apply small utility classes directly in the HTML: `text-sm text-zinc-300 leading-relaxed`. This keeps styles co-located with the components that use them and avoids the common problem of CSS files growing large and hard to maintain.
+Tailwind CSS is a styling approach where instead of writing separate CSS files, you apply small utility classes directly in the HTML. Claude Code set this up as part of the standard Next.js scaffolding.
 
-**Version 4** was a deliberate choice. Tailwind v4 introduced a CSS-first configuration model — all theme customization happens in a standard CSS file (`globals.css`) rather than a separate JavaScript config file. This is simpler and more portable. The project's entire theme is defined in 14 lines of CSS:
-
-```css
-:root {
-  --background: #0C0C0E;
-  --foreground: #E4E4E7;
-  --accent: #E8825A;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-```
-
-There is no `tailwind.config.js` file in this project. That is intentional — Tailwind v4 does not need one.
+**Version 4** uses a CSS-first configuration model: all theme customization happens in a standard CSS file (`globals.css`) rather than a separate JavaScript config file. The project's entire theme is defined in 14 lines of CSS. There is no `tailwind.config.js` file; Tailwind v4 does not need one.
 
 ### Why Dark Theme
 
-The dashboard presents dense data — tables, metrics, color-coded priority badges, volume bars. Dark backgrounds with light text reduce visual fatigue when scanning large amounts of information. The dark theme also matches the aesthetic of developer tools (terminals, code editors, GitHub's dark mode), which is appropriate for a project that analyzes a developer tool's issue backlog.
+I chose a dark theme because the dashboard presents dense data: tables, metrics, color-coded priority badges, volume bars. Dark backgrounds with light text reduce visual fatigue when scanning large amounts of information. It also matches the aesthetic of developer tools (terminals, code editors, GitHub's dark mode), which is appropriate for a project analyzing a developer tool's issue backlog.
 
-The color palette uses zinc-scale grays (`#0C0C0E` background, `#E4E4E7` text) with a warm terracotta accent (`#E8825A`) for interactive elements and branding. Priority levels use an intuitive traffic-light system: red for P0 (Critical), yellow for P1 (High), and blue for P2 (Medium).
+The color palette uses zinc-scale grays with a warm terracotta accent (`#E8825A`) for interactive elements. Priority levels use an intuitive traffic-light system: red for P0 (Critical), yellow for P1 (High), and blue for P2 (Medium).
 
 ### Why PapaParse and CSV Over a Database
 
-The dataset is 1,000 rows with 8 columns. It does not change at runtime — no one is adding or editing issues through the dashboard. This makes a database unnecessary overhead. A CSV file is:
+The dataset is 1,000 rows with 8 columns. It does not change at runtime; no one is adding or editing issues through the dashboard. This makes a database unnecessary overhead. A CSV file is:
 
-- **Human-readable** — you can open it in any text editor or spreadsheet app and see exactly what data the dashboard is using
-- **Version-controlled** — it lives in the `data/` folder alongside the code, so every change is tracked in Git
-- **Zero infrastructure** — no database server to set up, maintain, or pay for
+- **Human-readable**: you can open it in any text editor or spreadsheet app and see exactly what data the dashboard is using
+- **Version-controlled**: it lives in the `data/` folder alongside the code, so every change is tracked in Git
+- **Zero infrastructure**: no database server to set up, maintain, or pay for
 
-PapaParse is the standard library for parsing CSV in JavaScript. It handles edge cases like quoted fields, escaped commas, and empty lines. The parsing happens server-side in `src/lib/data.ts` — the raw CSV never reaches the user's browser.
+PapaParse is the standard library for parsing CSV in JavaScript. Claude Code selected it when I asked for CSV support. The parsing happens server-side so the raw CSV never reaches the user's browser.
 
 ### Why Keyword-Based Classification
 
-Each of the 1,000 issues is assigned to one of 7 themes (or "Other") using keyword matching. The classifier in `src/lib/theme-classifier.ts` works like this:
+Each of the 1,000 issues is assigned to one of 7 themes (or "Other") using keyword matching. I directed Claude Code to build this classifier rather than using a machine learning model, for three reasons I can defend:
 
-1. Combine the issue's title and AI-generated summary into one text string
-2. Check that text against each theme's keyword list (ranging from 15 to 35 keywords per theme)
-3. Single-word matches score 1 point; multi-word phrase matches score 2 points (because they are more specific and less likely to be false positives)
-4. The theme with the highest score wins; ties go to whichever theme is checked first
-5. If nothing matches, the issue goes to "Other"
+1. **Transparency**: anyone can read the keyword lists and understand exactly why an issue was classified a certain way. ML models are black boxes.
+2. **Reproducibility**: running the classifier twice on the same data gives the same result. LLMs can give different answers each time.
+3. **Simplicity**: the keyword lists were developed from the data itself (bottom-up clustering), so they already capture the natural language patterns in the issue titles.
 
-The alternative would be using a machine learning model or large language model (LLM) to classify issues. That was rejected for three reasons:
-
-1. **Transparency** — anyone can read the keyword lists and understand exactly why an issue was classified a certain way. ML models are black boxes.
-2. **Reproducibility** — running the classifier twice on the same data gives the same result. LLMs can give different answers each time.
-3. **Simplicity** — the keyword lists were developed from the data itself (bottom-up clustering), so they already capture the natural language patterns in the issue titles. A more sophisticated approach would not meaningfully improve accuracy for this dataset size.
-
-The estimated accuracy is plus or minus 15%, which is acknowledged in the analysis memo.
+The classifier works by scoring each issue's text against each theme's keyword list. Multi-word phrases score higher than single words because they are more specific. The estimated accuracy is plus or minus 15%, which is acknowledged in the analysis memo.
 
 ### Why Lucide React Icons
 
-Lucide is an open-source icon library that provides clean, consistent SVG icons as React components. The project uses icons like `ArrowLeft`, `ExternalLink`, `FileText`, `AlertTriangle`, and others for navigation and visual indicators.
-
-Lucide was chosen over alternatives like Heroicons or Font Awesome because:
-- It has a large icon set (1,000+) with a cohesive visual style
-- Icons are tree-shakeable — only the icons you import are included in the final build, keeping the bundle small
-- It is the icon library used by shadcn/ui, which is the most popular component library in the Next.js ecosystem
+Lucide is an open-source icon library that Claude Code selected as part of the project setup. It provides clean, consistent SVG icons as React components and is the icon library used by the shadcn/ui ecosystem, which is widely adopted in Next.js projects.
 
 ### Why Server Components + Client Components
 
-Next.js lets you choose whether each component runs on the server or in the browser. This project uses both:
+Next.js lets you choose whether each component runs on the server or in the browser. Claude Code structured the project to use both, and once it was explained to me, the split made intuitive sense:
 
-**Server Components** (run on the server, send finished HTML to the browser):
-- `src/app/layout.tsx` — the root HTML structure, fonts, metadata
-- `src/app/page.tsx` — reads the CSV from disk, classifies issues, passes data to dashboard components
-- `src/app/analysis/page.tsx` — the analysis memo (pure static content, no interactivity)
+- **Server Components** handle data loading and static content: they read the CSV, classify issues, and render the analysis memo. This work happens on the server so users never download the raw data.
+- **Client Components** handle interactivity: search, filtering, sorting, pagination, and expandable sections. These run in the browser because they need to respond to user input.
 
-**Client Components** (run in the browser, can respond to user interaction):
-- `src/components/dashboard/issues-table.tsx` — search, filter, sort, pagination
-- `src/components/dashboard/themes-overview.tsx` — expandable accordion rows
-- `src/components/dashboard/summary-cards.tsx` — metric cards with icons
-- `src/components/dashboard/top-issues.tsx` — top 10 priority issues
-- `src/components/dashboard/user-stories.tsx` — user story cards
-
-The split follows a practical rule: if a component needs to respond to clicks, keystrokes, or maintain state (like which filter is selected), it must be a client component. If it just displays content or reads from the filesystem, it should be a server component. The homepage (`page.tsx`) *must* be a server component because it uses `fs.readFileSync()` to read the CSV — that function does not exist in browsers.
+The homepage *must* be a server component because it reads a file from disk, something browsers cannot do.
 
 ### Why Playwright for PDF Generation
 
-The analysis memo (`/analysis`) is a long-form document that someone might want to read offline, print, or share as a file. The project includes a script (`generate-pdf.mjs`) that converts the live web page into a PDF.
+The analysis memo is a long-form document that someone might want to read offline or share as a file. I asked Claude Code to set up a way to export it as a PDF, and it built a script (`generate-pdf.mjs`) that opens the live web page in a headless (invisible) Firefox browser and prints it to PDF. This ensures the PDF looks identical to the web page: same fonts, colors, layout.
 
-**Playwright** was chosen over alternatives because:
-- It can automate real browsers (not just a rendering engine), so the PDF looks identical to the web page — same fonts, colors, layout
-- It supports **Firefox** specifically, which was chosen because Firefox's PDF engine handles the project's dark background and custom fonts more reliably than Chromium's print engine for this particular layout
-
-The script works by:
-1. Starting a local Next.js dev server on port 3099
-2. Opening the `/analysis` page in a headless (invisible) Firefox browser
-3. Waiting for all fonts and styles to load
-4. Calling the browser's built-in "print to PDF" function with A4 paper size
-5. Saving the result as `analysis-memo.pdf`
-6. Shutting everything down
-
-**Why not Puppeteer?** Puppeteer is listed in `package.json` but is **not used anywhere in the code**. It was likely the original approach before switching to Playwright. It remains as an unused dependency. See "Why Some Dependencies Are Unused" below.
+Firefox was used instead of Chrome because its PDF engine handled the dark background and custom fonts more reliably for this layout. Claude Code initially tried Puppeteer (a Chrome-based tool) but switched to Playwright with Firefox when the output quality was better.
 
 ### Why Static Data in Constants
 
-The file `src/lib/constants.ts` contains hardcoded data that does not come from the CSV:
+The file `src/lib/constants.ts` contains data that I authored, not data from the CSV:
 
-- **Theme definitions** — the 7 themes with their display names, descriptions, colors, estimated issue counts, and priority levels
-- **User stories** — 7 "As a [persona], I need [feature] so that [benefit]" statements, one per theme
-- **Top 10 issues** — a manually curated, ranked list of the most important issues with rationale for each ranking
-- **Priority color schemes** — the red/yellow/blue color codes for P0/P1/P2
+- **Theme definitions**: the 7 themes with their descriptions, colors, and priority levels
+- **User stories**: 7 "As a [persona], I need [feature] so that [benefit]" statements
+- **Top 10 issues**: a manually curated, ranked list with rationale for each ranking
+- **Priority color schemes**: the red/yellow/blue color codes for P0/P1/P2
 
-This data is kept in a constants file rather than in the CSV or computed dynamically because it represents **editorial judgment**, not raw data. The theme descriptions, user stories, and top 10 rankings are the product of analysis — they were written by a human after reviewing the data, and they should not change just because the CSV is updated. Separating editorial content from raw data makes both easier to maintain.
+This data is kept separate because it represents **editorial judgment**, not raw data. The theme descriptions, user stories, and top 10 rankings are the product of my analysis. They should not change just because the CSV is updated.
 
 ### Why Two CSV Files
 
 The `data/` folder contains two CSV files:
 
-1. **`claude_code_unique_1k_issues.csv`** — the primary dataset. 1,000 deduplicated issues used by the dashboard.
-2. **`claude_code_issues.csv`** — the full, unfiltered dataset of ~6,246 issues. This is the raw source data before deduplication.
+1. **`claude_code_unique_1k_issues.csv`**: the primary dataset. 1,000 deduplicated issues used by the dashboard.
+2. **`claude_code_issues.csv`**: the full, unfiltered dataset of ~6,246 issues. This is the raw source data before deduplication.
 
-Only the first file is actually loaded by the application (`src/lib/data.ts` line 8). The full dataset is kept in the repository for transparency and reproducibility — anyone who wants to verify the deduplication process or run their own analysis can start from the same raw data. It is an audit trail, not an active data source.
+Only the first file is actually loaded by the application (`src/lib/data.ts` line 8). The full dataset is kept in the repository for transparency and reproducibility; anyone who wants to verify the deduplication process or run their own analysis can start from the same raw data. It is an audit trail, not an active data source.
 
 ### Why Vercel for Hosting
 
-Vercel is the company that builds Next.js. Their hosting platform is purpose-built for Next.js applications, which means:
+When I asked Claude Code how to deploy the site, it recommended Vercel, the company that builds Next.js. Their hosting platform is purpose-built for Next.js applications:
 
-- **Zero configuration** — push code to GitHub, and Vercel builds and deploys it automatically
-- **Server Components work out of the box** — the CSV parsing and classification happen on Vercel's servers, not in the user's browser
-- **Free tier** — more than sufficient for a portfolio project
-- **Preview deployments** — every Git branch gets its own live URL for testing before merging
-
-The alternative would be deploying to a generic platform like AWS, which would require configuring a Node.js server, setting up build pipelines, and managing infrastructure — all unnecessary complexity for a portfolio project.
+- **Zero configuration**: push code to GitHub, and Vercel builds and deploys it automatically
+- **Server Components work out of the box**: the CSV parsing and classification happen on Vercel's servers, not in the user's browser
+- **Free tier**: more than sufficient for a portfolio project
 
 ### Why Some Dependencies Are Unused
 
-Three packages are installed but not imported anywhere in the codebase:
+Three packages are installed but not used anywhere in the code. This is a normal artifact of iterative development with Claude Code; some tools were tried and replaced, others were included during scaffolding and never needed:
 
 | Package | Why It's There | Why It's Unused |
 |---|---|---|
-| **Puppeteer** | Was likely the original PDF generation tool | Replaced by Playwright (which uses Firefox instead of Chromium). Never removed from `package.json`. |
-| **Recharts** | A charting library (bar charts, pie charts, etc.) | The dashboard uses CSS-based volume bars in the theme overview instead of rendered charts. Recharts was probably planned for visualizations that were replaced by a simpler approach. |
-| **class-variance-authority (CVA)** | A utility for creating component variants (e.g., a Button that can be "primary", "secondary", "danger") | Commonly installed alongside shadcn/ui component libraries. No component variants were needed, so it was never used. Likely a leftover from initial project scaffolding. |
+| **Puppeteer** | Claude Code's first attempt at PDF generation | Replaced by Playwright when Firefox produced better output. Never removed from `package.json`. |
+| **Recharts** | A charting library for bar/pie charts | The dashboard ended up using CSS-based volume bars instead. Likely planned for visualizations that were replaced by a simpler approach. |
+| **class-variance-authority (CVA)** | A utility for component variants, part of the shadcn/ui ecosystem | Included during project scaffolding but never needed. No component variants were required. |
 
 These could be removed from `package.json` without any effect on the application. They were left in place because removing them is a cleanup task, not a functional concern.
 
@@ -215,7 +157,7 @@ These could be removed from `package.json` without any effect on the application
 
 ## 4. How the 7 Themes Were Prioritized
 
-This is one of the most important decisions in the project, and it deserves a detailed explanation — especially because **the theme with the highest issue count is not the highest priority**.
+This is one of the most important decisions in the project, and it deserves a detailed explanation, especially because **the theme with the highest issue count is not the highest priority**.
 
 ### The Framework: Impact x Frequency x Risk
 
@@ -227,7 +169,7 @@ Every theme and every individual issue was evaluated on three dimensions:
 | **Frequency** | How many users are affected, and how often? | A bug that breaks the Bash tool for all Windows users is high frequency across an entire platform. |
 | **Risk** | How likely is this to escalate into something worse if left unfixed? | A runaway agent that ignores user commands is a precursor to loss-of-control scenarios. |
 
-A theme's priority is determined by combining all three dimensions — **not by issue count alone**. Volume (how many issues exist under a theme) is one input to the Frequency dimension, but it can be outweighed by the other two.
+A theme's priority is determined by combining all three dimensions, **not by issue count alone**. Volume (how many issues exist under a theme) is one input to the Frequency dimension, but it can be outweighed by the other two.
 
 ### Why Issue Count Does Not Equal Priority
 
@@ -244,7 +186,7 @@ Here are the 7 themes sorted by issue count:
 | **Permissions & Security** | **~75** | **7.5%** | **P0** |
 
 Notice:
-- **Cross-Platform & VM** has the most issues (195) and is P0. Here, volume and priority happen to align — the Bash tool is completely broken on Windows, locking out an entire platform.
+- **Cross-Platform & VM** has the most issues (195) and is P0. Here, volume and priority happen to align: the Bash tool is completely broken on Windows, locking out an entire platform.
 - **Permissions & Security** has the *fewest* issues of any theme (75, just 7.5%) but is also P0. This is where the framework's strength shows.
 
 ### P0 Themes Explained
@@ -252,21 +194,21 @@ Notice:
 **P0 means "fix this before anything else."** Three themes are P0:
 
 #### 1. Cross-Platform & VM (~195 issues, 19.5%)
-- **Impact**: High — the Bash tool literally does not work on Windows. Users cannot execute any commands.
-- **Frequency**: Very high — affects every Windows, WSL, and enterprise AD user.
-- **Risk**: Moderate — unlikely to escalate, but locks out a large user segment entirely.
+- **Impact**: High. The Bash tool literally does not work on Windows. Users cannot execute any commands.
+- **Frequency**: Very high. Affects every Windows, WSL, and enterprise AD user.
+- **Risk**: Moderate. Unlikely to escalate, but locks out a large user segment entirely.
 - **Why P0**: Pure breadth. Nearly 1 in 5 issues trace back to platform compatibility. A developer tool that does not work on Windows is not a cross-platform tool.
 
 #### 2. Terminal Rendering & UI (~130 issues, 13%)
-- **Impact**: High — infinite `setState` loops crash sessions unrecoverably. Flickering and scroll corruption make the tool unusable.
-- **Frequency**: High — rendering bugs affect all users across all platforms, though severity varies by terminal emulator.
-- **Risk**: Moderate — a crashed session means lost work, but the damage is bounded to that session.
+- **Impact**: High. Infinite `setState` loops crash sessions unrecoverably. Flickering and scroll corruption make the tool unusable.
+- **Frequency**: High. Rendering bugs affect all users across all platforms, though severity varies by terminal emulator.
+- **Risk**: Moderate. A crashed session means lost work, but the damage is bounded to that session.
 - **Why P0**: When the user cannot see what the tool is doing, they cannot use it safely. Rendering failures also undermine trust ("is this thing working or not?").
 
-#### 3. Permissions & Security (~75 issues, 7.5%) — *lowest count, still P0*
-- **Impact**: **Maximum** — an agent executing a destructive database command without consent (issue #26913) is a safety failure, not just a bug. CLAUDE.md directory traversal (issue #26944) is a potential data exfiltration vector.
+#### 3. Permissions & Security (~75 issues, 7.5%), *lowest count, still P0*
+- **Impact**: **Maximum**. An agent executing a destructive database command without consent (issue #26913) is a safety failure, not just a bug. CLAUDE.md directory traversal (issue #26944) is a potential data exfiltration vector.
 - **Frequency**: Low in raw numbers, but any single occurrence can cause irreversible damage.
-- **Risk**: **Maximum** — Claude Code is an AI agent with direct access to users' filesystems, codebases, and command lines. When the permission system fails, there is no second line of defense. This is the category most directly connected to Anthropic's Responsible Scaling Policy.
+- **Risk**: **Maximum**. Claude Code is an AI agent with direct access to users' filesystems, codebases, and command lines. When the permission system fails, there is no second line of defense. This is the category most directly connected to Anthropic's Responsible Scaling Policy.
 - **Why P0 despite the low count**: A single permission bypass that deletes a production database outweighs a hundred UI flickering bugs. The Impact and Risk dimensions are so high that they override the low Frequency score. For a company whose mission centers on AI safety, any issue where the agent takes an unauthorized destructive action is automatically the highest priority.
 
 ### P1 Themes Explained
@@ -320,7 +262,7 @@ This means:
 - An MCP & Extensibility issue (theme default P1) that mentions "crash" gets elevated to P0
 - An "Other" issue (theme default P2) that mentions "bug" or "error" gets elevated to P1
 
-The escalation is one-directional — issues can be promoted but never demoted below their theme default.
+The escalation is one-directional: issues can be promoted but never demoted below their theme default.
 
 ### The Classification Waterfall
 
@@ -394,4 +336,4 @@ Dashboard components (client components)
 User sees the dashboard
 ```
 
-The constants file (`constants.ts`) feeds the theme overview and top issues components directly — it is editorial content, not derived from the CSV.
+The constants file (`constants.ts`) feeds the theme overview and top issues components directly. It is editorial content, not derived from the CSV.
