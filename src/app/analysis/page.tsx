@@ -768,12 +768,11 @@ export default function AnalysisPage() {
           <p className="text-sm text-zinc-300 leading-relaxed">
             Every section went through multiple rounds of revision. I challenged vague claims, demanded
             specific issue references to back up every assertion, and restructured the narrative when the
-            framing did not match the story the data was actually telling. A kernel panic is not a
-            &quot;performance issue&quot;. It is a hardware-level safety failure. The weird issues section
-            is not just a list of funny titles. The genuinely alarming ones (the runaway agent, the
+            framing did not match the story the data was actually telling. The weird issues section, for
+            example, matters because the genuinely alarming ones (the runaway agent, the
             fabricated webhook) connect directly to Anthropic&apos;s safety mission. The user communication
-            strategy is not generic advice. It is shaped around the specific channels and tone that work
-            for open-source communities.
+            strategy is similarly tailored to the specific channels and tone that work for open-source
+            communities.
           </p>
 
           <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Tools used</h3>
