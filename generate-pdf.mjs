@@ -1,4 +1,4 @@
-import { chromium } from "playwright";
+import { firefox } from "playwright";
 import { spawn } from "child_process";
 import { setTimeout as sleep } from "timers/promises";
 
@@ -25,10 +25,11 @@ await new Promise((resolve) => {
 });
 
 await sleep(2000);
-console.log("Server ready. Launching browser...");
+console.log("Server ready. Launching Firefox...");
 
-const browser = await chromium.launch({ channel: "chrome" });
-const page = await browser.newPage();
+const browser = await firefox.launch({ headless: true });
+const context = await browser.newContext();
+const page = await context.newPage();
 
 await page.setViewportSize({ width: 1200, height: 800 });
 console.log(`Navigating to ${URL}...`);

@@ -682,7 +682,7 @@ export default function AnalysisPage() {
           <h2 className="text-xl font-semibold text-zinc-100">9. Tabitha&apos;s PM Thought Process</h2>
 
           <p className="text-sm text-zinc-300 leading-relaxed">
-            Full Methodology: From raw data to actionable insight. The process behind the analysis.
+            From raw data to actionable insight. The process behind the analysis.
           </p>
 
           <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Step 1: Data collection</h3>
