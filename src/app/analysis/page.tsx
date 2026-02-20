@@ -786,12 +786,17 @@ export default function AnalysisPage() {
           <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">The dashboard</h3>
 
           <p className="text-sm text-zinc-300 leading-relaxed">
-            Alongside this memo, I built an interactive dashboard that lets you browse all 1,000
-            deduplicated issues in one place. You can filter by theme, priority, and open/closed state,
-            search by keyword or issue number, and sort by any column. Each theme is visualized with volume
-            bars and expandable descriptions so you can see the shape of the backlog at a glance without
-            reading the full memo. The top 10 priority issues are pinned and highlighted at the top of the
-            table. The idea is that this memo explains the analysis once, and the{" "}
+            Alongside this memo, I leveraged Claude Code to build an interactive dashboard. I described
+            what I wanted — a filterable, searchable interface for browsing all 1,000 issues — and Claude
+            Code recommended and scaffolded the tech stack: Next.js 16, React 19, TypeScript, and
+            Tailwind CSS v4. From there I directed the build through iterative prompting, specifying the
+            layout, the data I wanted surfaced, the visual design, and the interaction patterns, then
+            reviewing and refining the output at each step. The dashboard lets you filter by theme,
+            priority, and open/closed state, search by keyword or issue number, and sort by any column.
+            Each theme is visualized with volume bars and expandable descriptions so you can see the shape
+            of the backlog at a glance without reading the full memo. The top 10 priority issues are pinned
+            and highlighted at the top of the table. The idea is that this memo explains the analysis once,
+            and the{" "}
             <Link href="/" className="text-[#E8825A] hover:underline">dashboard</Link>{" "}
             is what you come back to when you need to look something up.
           </p>
