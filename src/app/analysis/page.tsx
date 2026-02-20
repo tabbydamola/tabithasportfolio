@@ -697,23 +697,28 @@ export default function AnalysisPage() {
           <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Step 2: Deduplication</h3>
 
           <p className="text-sm text-zinc-300 leading-relaxed">
-            I ran a three-pass deduplication process to bring 6,246 issues down to 1,000 unique
-            representatives. First pass: title normalization (stripping [BUG]/[FEATURE] prefixes, version
-            numbers, punctuation) to catch exact and near-exact matches. Second pass: keyword clustering
-            using 35 regex patterns targeting known problem signatures. Third pass: selecting one
+            I used Claude Code to run a three-pass deduplication process, bringing 6,246 issues down to
+            1,000 unique representatives. I prompted it to normalize titles first (stripping [BUG]/[FEATURE]
+            prefixes, version numbers, punctuation) to catch exact and near-exact matches, then cluster by
+            keyword using 35 regex patterns targeting known problem signatures, and finally select one
             representative per sub-cluster, prioritizing uncategorized issues (which are more likely to be
-            genuinely unique). The resulting duplicate rate of roughly 42% is consistent with what I would
-            expect from a high-traffic open source repo.
+            genuinely unique). At each pass I reviewed the output, adjusted the prompts where clusters were
+            too broad or too narrow, and validated the results against spot checks of the raw data. The
+            resulting duplicate rate of roughly 42% is consistent with what I would expect from a
+            high-traffic open source repo.
           </p>
 
           <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Step 3: Classification and theme development</h3>
 
           <p className="text-sm text-zinc-300 leading-relaxed">
-            I assigned each of the 1,000 issues to one primary theme via keyword pattern matching against
-            title and body text. The seven themes emerged from the clusters themselves. I did not start
-            with categories and sort into them. Count estimates should be treated as plus or minus 15%.
-            About 200 to 250 of the 1,000 issues are pure feature requests, classified by related theme
-            where they address a gap tied to an existing failure pattern.
+            I directed Claude Code to assign each of the 1,000 issues to one primary theme via keyword
+            pattern matching against title and body text. The seven themes were not categories I came in
+            with — they emerged from the clusters themselves, which I reviewed and refined through iterative
+            prompting until the groupings reflected genuinely distinct problem areas. I guided which keywords
+            to weight, merged themes that overlapped, and split apart clusters that were too broad. Count
+            estimates should be treated as plus or minus 15%. About 200 to 250 of the 1,000 issues are pure
+            feature requests, classified by related theme where they address a gap tied to an existing
+            failure pattern.
           </p>
 
           <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Step 4: Prioritization</h3>
