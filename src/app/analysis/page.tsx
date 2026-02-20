@@ -679,10 +679,10 @@ export default function AnalysisPage() {
 
         {/* 9. How We Did This */}
         <section className="space-y-4">
-          <h2 className="text-xl font-semibold text-zinc-100">9. How I Did This</h2>
+          <h2 className="text-xl font-semibold text-zinc-100">9. Tabitha&apos;s PM Thought Process</h2>
 
           <p className="text-sm text-zinc-300 leading-relaxed">
-            Here is the full methodology, step by step.
+            Full Methodology: From raw data to actionable insight. The process behind the analysis.
           </p>
 
           <h3 className="text-base font-semibold text-zinc-200 mt-6 mb-2">Step 1: Data collection</h3>
