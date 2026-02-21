@@ -802,9 +802,6 @@ export default function AnalysisPage() {
         <HR />
 
         <footer className="text-center pb-8">
-          <p className="text-sm text-zinc-400 mb-4">
-            Thank you for reading.
-          </p>
           <p className="text-xs text-zinc-600">
             Data source: anthropics/claude-code GitHub Issues
           </p>
